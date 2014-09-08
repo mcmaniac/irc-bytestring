@@ -9,7 +9,7 @@ module Network.IRC.ByteString.Parser
        , ircLine
        ) where
 import Control.Applicative
-import Data.Attoparsec.Char8 as Char8
+import Data.Attoparsec.ByteString.Char8 as Char8
 import qualified Data.Attoparsec.ByteString as Word8
 import qualified Data.Attoparsec.Text as T
 import Data.ByteString.Char8 as BS
