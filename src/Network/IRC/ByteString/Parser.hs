@@ -90,20 +90,15 @@ isNickChar c = isAlphaNum c || isSpecial c
 isSpecial c = c == '-' || c == '[' || c == ']' || c == '\\' || c == '`'
               || c == '^' || c == '{' || c == '}' || c == '_'
 
-nick = BS.cons <$> satisfy isAlpha
-               <*> takeWhile isNickChar
-               <?> "nick"
+nick = takeWhile isNickChar <?> "nick"
 
 isUserChar c = isNonWhite c && c /= '@'
 
 user = takeWhile1 isUserChar <?> "username"
 
-isHostChar c = isAlphaNum c || c == '.' || c == '-'
+isHostChar c = isAlphaNum c || c == '.' || c == '-' || c == ':' || c == '/'
 
-host = cons
-       <$> satisfy isAlpha
-       <*> takeWhile1 isHostChar
-       <?> "hostname"
+host = takeWhile1 isHostChar <?> "hostname"
 
 prefix = char ':' *> eitherP (userInfo <* end) (serverName <* end)
          <?> "prefix"
