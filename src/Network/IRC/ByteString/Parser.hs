@@ -48,17 +48,17 @@ fromIRCMsg msg = BS.concat $ [prefix', command', params', trail, "\r\n"]
                                `append` maybeUser
                                `append` maybeHost
                                `append` " "
-            where 
+            where
               maybeUser  = maybe ""  ('!' `cons`) (userName info)
               maybeHost  = maybe "" ('@' `cons`) (userHost info)
-      
-        command' = msgCmd msg            
-        
+
+        command' = msgCmd msg
+
         paramList = msgParams msg
         params'
           | Prelude.null paramList = ""
           | otherwise = ' ' `cons` intercalate " " (msgParams msg)
-      
+
         t = msgTrail msg
         trail
           | BS.null t = ""
@@ -79,7 +79,7 @@ isNonWhite c = c /= ' ' && c /= '\r' && c /= '\n' && c /= '\0'
 isChanPrefix c = c == '#' || c  == '$'
 isChanChar c = isNonWhite c && c /= '\x007' && c /= ','
 
-chan = cons 
+chan = cons
        <$> (satisfy isChanPrefix  <?> "channel prefix")
        <*> (takeWhile1 isChanChar <?> "channel name")
 
@@ -89,7 +89,7 @@ isSpecial c = c == '-' || c == '[' || c == ']' || c == '\\' || c == '`'
               || c == '^' || c == '{' || c == '}' || c == '_'
 
 nick = BS.cons <$> satisfy isAlpha
-               <*> takeWhile isNickChar 
+               <*> takeWhile isNickChar
                <?> "nick"
 
 isUserChar c = isNonWhite c && c /= '@'
@@ -100,7 +100,7 @@ isHostChar c = isAlphaNum c || c == '.' || c == '-'
 
 host = cons
        <$> satisfy isAlpha
-       <*> takeWhile1 isHostChar 
+       <*> takeWhile1 isHostChar
        <?> "hostname"
 
 prefix = char ':' *> eitherP (userInfo <* end) (serverName <* end)
@@ -108,25 +108,25 @@ prefix = char ':' *> eitherP (userInfo <* end) (serverName <* end)
   where
     end = spaces1 <|> endOfInput
     serverName = host
-    userInfo = UserInfo <$> nick 
+    userInfo = UserInfo <$> nick
                         <*> optional (char '!' >> user)
                         <*> optional (char '@' >> host)
 
-command = alpha <|> numeric        
+command = alpha <|> numeric
   where
     alpha = takeWhile1 isAlpha
-    numeric = 
-      cons 
+    numeric =
+      cons
       <$> satisfy isNumber
       <*> (cons
            <$> satisfy isNumber
-           <*> (cons 
+           <*> (cons
                 <$> satisfy isNumber
                 <*> pure "")
            )
       <?> "command name"
 
-params = fromMaybe [] <$> optional 
+params = fromMaybe [] <$> optional
          (spaces1 >> param `sepBy` spaces1) <?> "params list"
   where param = cons
                 <$> satisfy (\c -> isNonWhite c && c /= ':')
