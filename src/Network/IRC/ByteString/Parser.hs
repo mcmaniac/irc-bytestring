@@ -73,6 +73,8 @@ ircMsg = IRCMsg Nothing
 spaces = skipWhile isSpaceNonLine          <?> "optional whitespace"
 spaces1 = satisfy isSpaceNonLine >> spaces <?> "required whitespace"
 
+crlf = string "\r\n"
+
 isSpaceNonLine = (&&) <$> isSpace <*> not . T.isEndOfLine
 isNonWhite c = c /= ' ' && c /= '\r' && c /= '\n' && c /= '\0'
 
@@ -136,5 +138,5 @@ mess = spaces >> fromMaybe "" <$>
        optional (char ':' >> Word8.takeWhile (not . isEndOfLine))
        <?> "message body"
 
-ircLine = IRCMsg <$> optional prefix <*> command <*> params <*> mess <* skipSpace
-          <?> "IRC line" 
+ircLine = IRCMsg <$> optional prefix <*> command <*> params <*> mess <* optional crlf
+          <?> "IRC line"
