@@ -78,12 +78,14 @@ crlf = string "\r\n"
 isSpaceNonLine = (&&) <$> isSpace <*> not . T.isEndOfLine
 isNonWhite c = c /= ' ' && c /= '\r' && c /= '\n' && c /= '\0'
 
+{-
 isChanPrefix c = c == '#' || c  == '$'
 isChanChar c = isNonWhite c && c /= '\x007' && c /= ','
 
 chan = cons
        <$> (satisfy isChanPrefix  <?> "channel prefix")
        <*> (takeWhile1 isChanChar <?> "channel name")
+-}
 
 isNickChar c = isAlphaNum c || isSpecial c
 
